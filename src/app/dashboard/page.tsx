@@ -1,5 +1,7 @@
 import HistoryCard from "@/components/dashboard/history-card";
+import PopularTopics from "@/components/dashboard/popular-topics";
 import QuizMeCard from "@/components/dashboard/quiz-me-card";
+import Recent from "@/components/dashboard/recent";
 import { getAuthSession } from "@/lib/next-auth";
 import { redirect } from "next/navigation";
 
@@ -24,7 +26,10 @@ export default async function DashboardPage() {
         <QuizMeCard />
         <HistoryCard />
       </div>
-      <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-7"></div>
+      <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-7">
+        <PopularTopics />
+        <Recent />
+      </div>
     </main>
   );
 }
