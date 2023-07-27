@@ -18,7 +18,7 @@ export default async function Navbar() {
         </Link>
 
         <div className="flex items-center">
-          <ThemeToggle className="mr-4" />
+          <ThemeToggle />
 
           <div className="flex items-center">
             {session?.user ? (
