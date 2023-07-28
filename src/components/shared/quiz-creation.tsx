@@ -2,7 +2,10 @@
 
 import { quizCreationSchema } from "@/schemas/form/quiz";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { BookOpen, CopyCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -28,6 +31,19 @@ import { Separator } from "../ui/separator";
 type Input = z.infer<typeof quizCreationSchema>;
 
 export default function QuizCreation() {
+  const router = useRouter();
+  const { mutate: getQuestions, isLoading } = useMutation({
+    mutationFn: async ({ amount, topic, type }: Input) => {
+      const res = await axios.post("/api/game", {
+        amount,
+        topic,
+        type,
+      });
+
+      return res.data;
+    },
+  });
+
   const form = useForm<Input>({
     defaultValues: {
       amount: 3,
@@ -38,7 +54,22 @@ export default function QuizCreation() {
   });
 
   const onSubmit = (input: Input) => {
-    console.log(input);
+    getQuestions(
+      {
+        amount: input.amount,
+        topic: input.topic,
+        type: input.type,
+      },
+      {
+        onSuccess: ({ gameId }) => {
+          if (form.getValues("type") === "open_ended") {
+            router.push(`/play/open-ended/${gameId}`);
+          } else {
+            router.push(`/play/mcq/${gameId}`);
+          }
+        },
+      }
+    );
   };
 
   form.watch();
@@ -121,7 +152,9 @@ export default function QuizCreation() {
                   Open Ended
                 </Button>
               </div>
-              <Button type="submit">Submit</Button>
+              <Button disabled={isLoading} type="submit">
+                Submit
+              </Button>
             </form>
           </Form>
         </CardContent>

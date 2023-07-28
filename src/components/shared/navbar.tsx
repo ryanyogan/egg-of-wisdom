@@ -13,7 +13,7 @@ export default async function Navbar() {
       <div className="flex items-center justify-between h-full gap-2 px-8 mx-auto max-w-7xl">
         <Link href="/" className="flex items-center gap-2">
           <p className="rounded-lg border-2 border-b-4 border-r-4 border-black px-2 py-1 text-xl transition-all font-bold hover:-translate-y-[2px] md:block dark:border-white">
-            Egg Of Wisdom
+            Egg 🥚 Wisdom
           </p>
         </Link>
 
