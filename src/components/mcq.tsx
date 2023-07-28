@@ -129,7 +129,7 @@ export default function MCQ({ game }: MCQProps) {
   }
 
   return (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw]">
+    <div className="mt-10 sm:mt-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw]">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
           <p>
