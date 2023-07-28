@@ -1,5 +1,6 @@
 "use client";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import D3WordCloud from "react-d3-cloud";
 
 const data = [
@@ -30,7 +31,16 @@ const fontSizeMapper = (word: { value: number }) => {
 };
 
 export default function WordCloud() {
+  const [mounted, setMounted] = useState(false);
   const theme = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>

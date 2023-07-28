@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     const questions = await gptRequest({ amount, topic, type });
 
-    return NextResponse.json(questions, { status: 200 });
+    return NextResponse.json({ questions }, { status: 200 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(
