@@ -1,14 +1,17 @@
 "use client";
 
+import { cn, formatTimeDelta } from "@/lib/utils";
 import { checkAnswerSchema } from "@/schemas/form/quiz";
 import { Game, Question } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { ChevronRight, Loader2, Timer } from "lucide-react";
+import { differenceInSeconds } from "date-fns";
+import { BarChart, ChevronRight, Loader2, Timer } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import McqCounter from "./mcq-counter";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useToast } from "./ui/use-toast";
 
@@ -22,6 +25,7 @@ export default function MCQ({ game }: MCQProps) {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [hasEnded, setHasEnded] = useState(false);
+  const [now, setNow] = useState<Date>(new Date());
   const { toast } = useToast();
 
   const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
@@ -94,6 +98,36 @@ export default function MCQ({ game }: MCQProps) {
     };
   }, [handleNext]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!hasEnded) {
+        setNow(new Date());
+      }
+    }, 1_000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [hasEnded]);
+
+  if (hasEnded) {
+    return (
+      <div className="absolute flex flex-col justify-center top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
+        <div className="px-4 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
+          You completed in{" "}
+          {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+        </div>
+        <Link
+          className={cn(buttonVariants(), "mt-2")}
+          href={`/statistics/${game.id}`}
+        >
+          View Statistics
+          <BarChart className="w-4 h-4 ml-2" />
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw]">
       <div className="flex flex-row justify-between items-center">
@@ -107,7 +141,9 @@ export default function MCQ({ game }: MCQProps) {
 
           <div className="flex self-start mt-3 text-slate-400">
             <Timer className="mr-2" />
-            <span className="mt-[2px]">00:00</span>
+            <span className="mt-[2px]">
+              {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+            </span>
           </div>
         </div>
 
