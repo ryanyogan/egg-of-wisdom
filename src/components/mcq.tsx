@@ -71,12 +71,22 @@ export default function MCQ({ game }: MCQProps) {
   }, [checkAnswer, toast, isChecking]);
 
   useEffect(() => {
-    document.addEventListener("keydown", (event) => {
+    const handleKeydown = (event: KeyboardEvent) => {
       if (Number(event.key) < 5) {
         setSelectedChoice(Number(event.key) - 1);
       }
-    });
-  }, []);
+
+      if (event.key === "Enter") {
+        handleNext();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }, [handleNext]);
 
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:w-[80vw] max-w-4xl w-[90vw]">
