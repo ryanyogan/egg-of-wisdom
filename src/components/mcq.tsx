@@ -4,7 +4,7 @@ import { checkAnswerSchema } from "@/schemas/form/quiz";
 import { Game, Question } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { ChevronRight, Timer } from "lucide-react";
+import { ChevronRight, Loader2, Timer } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import McqCounter from "./mcq-counter";
@@ -21,6 +21,7 @@ export default function MCQ({ game }: MCQProps) {
   const [selectedChoice, setSelectedChoice] = useState<number>(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+  const [hasEnded, setHasEnded] = useState(false);
   const { toast } = useToast();
 
   const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
@@ -65,10 +66,15 @@ export default function MCQ({ game }: MCQProps) {
           });
           setIncorrectAnswers((count) => count + 1);
         }
+        if (questionIndex === game.questions.length - 1) {
+          setHasEnded(true);
+          return;
+        }
+
         setQuestionIndex((index) => index + 1);
       },
     });
-  }, [checkAnswer, toast, isChecking]);
+  }, [checkAnswer, toast, isChecking, questionIndex, game.questions]);
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -105,7 +111,10 @@ export default function MCQ({ game }: MCQProps) {
           </div>
         </div>
 
-        <McqCounter correctAnswers={0} incorrectAnswers={3} />
+        <McqCounter
+          correctAnswers={correctAnswers}
+          incorrectAnswers={incorrectAnswers}
+        />
       </div>
 
       <Card className="w-full mt-4">
@@ -137,7 +146,8 @@ export default function MCQ({ game }: MCQProps) {
           </Button>
         ))}
 
-        <Button onClick={handleNext} className="mt-2">
+        <Button disabled={isChecking} onClick={handleNext} className="mt-2">
+          {isChecking && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

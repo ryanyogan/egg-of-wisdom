@@ -4,9 +4,6 @@ type IParams = {
   };
 };
 
-export default function OpenEndedGame(
-  request: Request,
-  { params }: { params: IParams }
-) {
+export default function OpenEndedGame({ params }: { params: IParams }) {
   return <div>GamePage</div>;
 }
