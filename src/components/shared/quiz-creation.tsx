@@ -31,9 +31,13 @@ import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { toast } from "../ui/use-toast";
 
+interface QuizCreationProps {
+  topic: string;
+}
+
 type Input = z.infer<typeof quizCreationSchema>;
 
-export default function QuizCreation() {
+export default function QuizCreation({ topic: topicParam }: QuizCreationProps) {
   const [showLoader, setShowLoader] = useState(false);
   const [finishedLoading, setFinishedLoading] = useState(false);
   const router = useRouter();
@@ -52,7 +56,7 @@ export default function QuizCreation() {
   const form = useForm<Input>({
     defaultValues: {
       amount: 3,
-      topic: "",
+      topic: topicParam,
       type: "mcq",
     },
     resolver: zodResolver(quizCreationSchema),

@@ -6,12 +6,18 @@ export const metadata = {
   title: "Quiz | Egg Of Wisdom",
 };
 
-export default async function QuizPage() {
+interface QuizPageProps {
+  searchParams: {
+    topic?: string;
+  };
+}
+
+export default async function QuizPage({ searchParams }: QuizPageProps) {
   const session = await getAuthSession();
 
   if (!session?.user) {
     return redirect("/");
   }
 
-  return <QuizCreation />;
+  return <QuizCreation topic={searchParams.topic ?? ""} />;
 }
