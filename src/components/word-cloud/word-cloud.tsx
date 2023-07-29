@@ -1,38 +1,20 @@
 "use client";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import D3WordCloud from "react-d3-cloud";
-
-const data = [
-  {
-    text: "Hi",
-    value: 3,
-  },
-  {
-    text: "React",
-    value: 10,
-  },
-  {
-    text: "Next.js",
-    value: 8,
-  },
-  {
-    text: "live",
-    value: 7,
-  },
-  {
-    text: "Angular",
-    value: 1,
-  },
-];
 
 const fontSizeMapper = (word: { value: number }) => {
   return Math.log2(word.value) * 5 + 16;
 };
 
-export default function WordCloud() {
+type Props = {
+  formattedTopics: { text: string; value: number }[];
+};
+export default function WordCloud({ formattedTopics }: Props) {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -51,7 +33,10 @@ export default function WordCloud() {
         rotate={0}
         padding={10}
         fill={theme.theme === "dark" ? "white" : "black"}
-        data={data}
+        data={formattedTopics}
+        onWordClick={(e, d) => {
+          router.push("/quiz?topic=" + d.text);
+        }}
       />
     </>
   );

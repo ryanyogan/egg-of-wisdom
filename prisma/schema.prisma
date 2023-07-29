@@ -67,6 +67,13 @@ model Game {
   @@index([userId], name: "userId")
 }
 
+model Topic {
+  id String @id @default(cuid())
+
+  topic String @unique
+  count Int
+}
+
 model Question {
   id                String   @id @default(cuid())
   question          String

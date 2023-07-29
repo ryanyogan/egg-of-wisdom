@@ -30,6 +30,21 @@ export async function POST(request: Request) {
       },
     });
 
+    await db.topic.upsert({
+      where: {
+        topic,
+      },
+      create: {
+        topic,
+        count: 1,
+      },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+    });
+
     const questions = await gptRequest({ amount, topic, type });
     console.log(questions, "QUESTIONS");
 
