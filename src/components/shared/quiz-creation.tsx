@@ -3,11 +3,13 @@
 import { quizCreationSchema } from "@/schemas/form/quiz";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { BookOpen, CopyCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import LoadingQuestions from "../loading-questions";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -27,10 +29,13 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { toast } from "../ui/use-toast";
 
 type Input = z.infer<typeof quizCreationSchema>;
 
 export default function QuizCreation() {
+  const [showLoader, setShowLoader] = useState(false);
+  const [finishedLoading, setFinishedLoading] = useState(false);
   const router = useRouter();
   const { mutate: getQuestions, isLoading } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
@@ -54,6 +59,7 @@ export default function QuizCreation() {
   });
 
   const onSubmit = (input: Input) => {
+    setShowLoader(true);
     getQuestions(
       {
         amount: input.amount,
@@ -61,18 +67,37 @@ export default function QuizCreation() {
         type: input.type,
       },
       {
-        onSuccess: ({ gameId }) => {
-          if (form.getValues("type") === "open_ended") {
-            router.push(`/play/open-ended/${gameId}`);
-          } else {
-            router.push(`/play/mcq/${gameId}`);
+        onError: (error) => {
+          setShowLoader(false);
+          if (error instanceof AxiosError) {
+            if (error.response?.status === 500) {
+              toast({
+                title: "Error",
+                description: "Something went wrong. Please try again later.",
+                variant: "destructive",
+              });
+            }
           }
+        },
+        onSuccess: ({ gameId }) => {
+          setFinishedLoading(true);
+          setTimeout(() => {
+            if (form.getValues("type") === "open_ended") {
+              router.push(`/play/open-ended/${gameId}`);
+            } else {
+              router.push(`/play/mcq/${gameId}`);
+            }
+          }, 2_000);
         },
       }
     );
   };
 
   form.watch();
+
+  if (showLoader) {
+    return <LoadingQuestions finished={finishedLoading} />;
+  }
 
   return (
     <div className="p-8 flex flex-col items-center">

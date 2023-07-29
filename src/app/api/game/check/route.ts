@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { checkAnswerSchema } from "@/schemas/form/quiz";
 import { NextResponse } from "next/server";
+import { compareTwoStrings } from "string-similarity";
 import { ZodError } from "zod";
 
 export async function POST(request: Request) {
@@ -42,6 +43,32 @@ export async function POST(request: Request) {
       });
 
       return NextResponse.json({ isCorrect }, { status: 200 });
+    }
+
+    if (question.questionType === "open_ended") {
+      let percentageSimilar = compareTwoStrings(
+        userAnswer.toLowerCase().trim(),
+        question.answer.toLowerCase().trim()
+      );
+      percentageSimilar = Math.round(percentageSimilar * 100);
+
+      await db.question.update({
+        where: {
+          id: questionId,
+        },
+        data: {
+          percentageCorrect: percentageSimilar,
+        },
+      });
+
+      return NextResponse.json(
+        {
+          percentageSimilar,
+        },
+        {
+          status: 200,
+        }
+      );
     }
   } catch (error) {
     if (error instanceof ZodError) {
