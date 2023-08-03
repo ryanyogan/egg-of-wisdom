@@ -5,6 +5,10 @@ import { quizCreationSchema } from "@/schemas/form/quiz";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
+export const config = {
+  runtime: "edge",
+};
+
 export async function POST(request: Request) {
   try {
     const session = await getAuthSession();
